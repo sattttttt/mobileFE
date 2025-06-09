@@ -4,20 +4,16 @@ import 'package:acara_kita/pages/main_wrapper.dart';
 import 'package:acara_kita/services/auth_service.dart';
 import 'package:acara_kita/services/notification_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // <-- 1. Impor paket
 
-void main() async {
-  // Pastikan semua binding siap sebelum menjalankan aplikasi
+Future<void> main() async { // <-- 2. Ubah main menjadi Future dan async
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Inisialisasi service notifikasi (termasuk meminta izin)
-  await NotificationService().init();
-  
-  // --- MODIFIKASI ADA DI SINI ---
-  // Menjadwalkan notifikasi harian saat aplikasi pertama kali dibuka
-  await NotificationService().scheduleDailyReminderNotification();
-  // ------------------------------
+  await dotenv.load(fileName: ".env"); // <-- 3. Muat file .env
 
-  // Inisialisasi data format untuk locale Indonesia
+  // Inisialisasi service
+  await NotificationService().init();
+  await NotificationService().scheduleDailyReminderNotification();
   await initializeDateFormatting('id_ID', null);
   
   runApp(const MyApp());
@@ -28,6 +24,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ... sisa kode MyApp tetap sama
     return MaterialApp(
       title: 'AcaraKita',
       theme: ThemeData.dark().copyWith(
@@ -62,6 +59,7 @@ class AuthCheck extends StatefulWidget {
 }
 
 class _AuthCheckState extends State<AuthCheck> {
+  // ... sisa kode AuthCheck tetap sama
   final AuthService _authService = AuthService();
   late Future<bool> _loginCheckFuture;
 

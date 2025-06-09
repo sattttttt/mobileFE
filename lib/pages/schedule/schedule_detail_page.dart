@@ -27,6 +27,13 @@ class ScheduleDetailPage extends StatelessWidget {
               title: 'Acara',
               content: schedule.title,
             ),
+             if (schedule.location != null && schedule.location!.isNotEmpty)
+              _buildDetailCard(
+                context,
+                icon: Icons.location_on_outlined,
+                title: 'Lokasi',
+                content: schedule.location!,
+              ),
             if (schedule.description != null && schedule.description!.isNotEmpty)
               _buildDetailCard(
                 context,
