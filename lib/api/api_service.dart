@@ -6,7 +6,7 @@ class ApiService {
   final String _baseUrl = "https://travel-assistent-1071529598982.us-central1.run.app/api";
   
   // SANGAT PENTING: Masukkan Google Maps API Key Anda di sini
-  final String _googleApiKey = "AIzaSyC54t-uUQa8Y8NG4AnLwq1zdTLODi044mw";
+  final String _googleApiKey = "API KEY 2";
 
   // --- FUNGSI USER & SCHEDULE ---
   Future<Map<String, dynamic>> loginUser(String email, String password) async {
