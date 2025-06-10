@@ -4,18 +4,14 @@ import 'package:acara_kita/pages/main_wrapper.dart';
 import 'package:acara_kita/services/auth_service.dart';
 import 'package:acara_kita/services/notification_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // <-- 1. Impor paket
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-Future<void> main() async { // <-- 2. Ubah main menjadi Future dan async
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  await dotenv.load(fileName: ".env"); // <-- 3. Muat file .env
-
-  // Inisialisasi service
+  await dotenv.load(fileName: ".env");
   await NotificationService().init();
   await NotificationService().scheduleDailyReminderNotification();
   await initializeDateFormatting('id_ID', null);
-  
   runApp(const MyApp());
 }
 
@@ -24,25 +20,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ... sisa kode MyApp tetap sama
     return MaterialApp(
       title: 'AcaraKita',
       theme: ThemeData.dark().copyWith(
-        primaryColor: Colors.deepPurple,
-        hintColor: Colors.deepPurpleAccent,
+        primaryColor: const Color(0xFF6A5AE0),
+        hintColor: const Color(0xFF9E95F1),
         scaffoldBackgroundColor: const Color(0xFF121212),
         colorScheme: const ColorScheme.dark(
-          primary: Colors.deepPurple,
-          secondary: Colors.deepPurpleAccent,
+          primary: Color(0xFF6A5AE0),
+          secondary: Color(0xFF9E95F1),
+          surface: Color(0xFF1E1E1E),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF1F1F1F),
           elevation: 0,
         ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF1F1F1F),
+          selectedItemColor: Color(0xFF9E95F1),
+          unselectedItemColor: Colors.grey,
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: const Color(0xFF6A5AE0),
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF2A2A2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
           ),
         ),
       ),
@@ -59,7 +69,6 @@ class AuthCheck extends StatefulWidget {
 }
 
 class _AuthCheckState extends State<AuthCheck> {
-  // ... sisa kode AuthCheck tetap sama
   final AuthService _authService = AuthService();
   late Future<bool> _loginCheckFuture;
 
@@ -75,7 +84,8 @@ class _AuthCheckState extends State<AuthCheck> {
       future: _loginCheckFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         }
         if (snapshot.data == true) {
           return const MainWrapper();
