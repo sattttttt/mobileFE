@@ -51,34 +51,65 @@ class _SchedulePageState extends State<SchedulePage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Nama Acara', border: OutlineInputBorder())),
+                    TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nama Acara',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    TextField(controller: locationController, decoration: const InputDecoration(labelText: 'Lokasi (Opsional)', border: OutlineInputBorder())),
+                    TextField(
+                      controller: locationController,
+                      decoration: const InputDecoration(
+                        labelText: 'Lokasi (Opsional)',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                     const SizedBox(height: 16),
-                    TextField(controller: descController, decoration: const InputDecoration(labelText: 'Deskripsi', border: OutlineInputBorder())),
+                    TextField(
+                      controller: descController,
+                      decoration: const InputDecoration(
+                        labelText: 'Deskripsi',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                     const SizedBox(height: 20),
-                    Text(startTime == null ? 'Pilih Waktu Mulai' : 'Mulai: ${DateFormat('dd MMM kk, HH:mm', 'id_ID').format(startTime!)}'),
+                    Text(
+                      startTime == null
+                          ? 'Pilih Waktu Mulai'
+                          : 'Mulai: ${DateFormat('dd MMM kk, HH:mm', 'id_ID').format(startTime!)}',
+                    ),
                     ElevatedButton(
                       child: const Text('Pilih Waktu Mulai'),
                       onPressed: () async {
                         DateTime? picked = await _pickDateTime();
-                        if (picked != null) setDialogState(() => startTime = picked);
+                        if (picked != null)
+                          setDialogState(() => startTime = picked);
                       },
                     ),
                     const SizedBox(height: 16),
-                    Text(endTime == null ? 'Pilih Waktu Selesai' : 'Selesai: ${DateFormat('dd MMM kk, HH:mm', 'id_ID').format(endTime!)}'),
+                    Text(
+                      endTime == null
+                          ? 'Pilih Waktu Selesai'
+                          : 'Selesai: ${DateFormat('dd MMM kk, HH:mm', 'id_ID').format(endTime!)}',
+                    ),
                     ElevatedButton(
                       child: const Text('Pilih Waktu Selesai'),
                       onPressed: () async {
                         DateTime? picked = await _pickDateTime();
-                        if (picked != null) setDialogState(() => endTime = picked);
+                        if (picked != null)
+                          setDialogState(() => endTime = picked);
                       },
                     ),
                   ],
                 ),
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Batal'),
+                ),
                 ElevatedButton(
                   onPressed: () => _saveSchedule(
                     title: titleController.text,
@@ -98,56 +129,82 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   Future<DateTime?> _pickDateTime() async {
-    final date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2030));
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+    );
     if (date == null) return null;
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
     if (time == null) return null;
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 
-  void _saveSchedule({required String title, String? location, required String description, required DateTime? startTime, required DateTime? endTime}) async {
+  void _saveSchedule({
+    required String title,
+    String? location,
+    required String description,
+    required DateTime? startTime,
+    required DateTime? endTime,
+  }) async {
     if (title.isEmpty || startTime == null || endTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Harap lengkapi semua field!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Harap lengkapi semua field!')),
+      );
       return;
     }
     if (endTime.isBefore(startTime)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Waktu selesai tidak boleh sebelum waktu mulai!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Waktu selesai tidak boleh sebelum waktu mulai!'),
+        ),
+      );
       return;
     }
     final userId = await _authService.getUserId();
     if (userId != null) {
-        try {
-          final scheduleData = await _apiService.createSchedule(
-            userId: userId,
-            title: title,
-            location: location,
-            description: description,
-            latitude: null, 
-            longitude: null,
-            startTime: startTime.toUtc().toIso8601String(),
-            endTime: endTime.toUtc().toIso8601String(),
-          );
-          await NotificationService().scheduleNotification(
-            id: scheduleData['schedule']['id'],
-            title: 'Pengingat: $title',
-            body: 'Acara Anda akan dimulai dalam 15 menit!',
-            scheduledTime: startTime,
-          );
-          if (mounted) Navigator.pop(context);
-          _loadSchedules();
-        } catch (e) {
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-        }
+      try {
+        final scheduleData = await _apiService.createSchedule(
+          userId: userId,
+          title: title,
+          location: location,
+          description: description,
+          latitude: null,
+          longitude: null,
+          startTime: startTime.toUtc().toIso8601String(),
+          endTime: endTime.toUtc().toIso8601String(),
+        );
+        await NotificationService().scheduleNotification(
+          id: scheduleData['schedule']['id'],
+          title: 'Pengingat: $title',
+          body: 'Acara Anda akan dimulai dalam 15 menit!',
+          scheduledTime: startTime,
+        );
+        if (mounted) Navigator.pop(context);
+        _loadSchedules();
+      } catch (e) {
+        if (mounted)
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
- Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Jadwal Saya"),
         actions: [
           IconButton(
-              icon: const Icon(Icons.refresh), onPressed: _loadSchedules)
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadSchedules,
+          ),
         ],
       ),
       body: RefreshIndicator(
@@ -161,8 +218,8 @@ class _SchedulePageState extends State<SchedulePage> {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Center(
-                  child: Text(
-                      'Belum ada jadwal. Tekan tombol + untuk menambah.'));
+                child: Text('Belum ada jadwal. Tekan tombol + untuk menambah.'),
+              );
             }
 
             final schedules = snapshot.data!.reversed.toList();
@@ -171,27 +228,37 @@ class _SchedulePageState extends State<SchedulePage> {
               itemCount: schedules.length,
               itemBuilder: (context, index) {
                 final schedule = Schedule.fromJson(schedules[index]);
-                final formattedDate =
-                    DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
-                        .format(schedule.startTime);
-                final formattedStartTime =
-                    DateFormat('HH:mm').format(schedule.startTime);
-                final formattedEndTime =
-                    DateFormat('HH:mm').format(schedule.endTime);
+                final formattedDate = DateFormat(
+                  'EEEE, dd MMMM yyyy',
+                  'id_ID',
+                ).format(schedule.startTime);
+                final formattedStartTime = DateFormat(
+                  'HH:mm',
+                ).format(schedule.startTime);
+                final formattedEndTime = DateFormat(
+                  'HH:mm',
+                ).format(schedule.endTime);
 
                 return Card(
                   elevation: 4,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(15.0),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ScheduleDetailPage(schedule: schedule),
-                          ));
+                    onTap: () async {
+                      // <-- Sudah async
+                      // Navigasi ke halaman detail dan tunggu hasilnya
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ScheduleDetailPage(schedule: schedule),
+                        ),
+                      );
+                      // Jika ingin refresh setelah kembali dari detail, bisa tambahkan:
+                      // _loadSchedules();
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -199,13 +266,15 @@ class _SchedulePageState extends State<SchedulePage> {
                         children: [
                           CircleAvatar(
                             radius: 28,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
                             child: Text(
                               DateFormat('dd').format(schedule.startTime),
                               style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -213,24 +282,33 @@ class _SchedulePageState extends State<SchedulePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(schedule.title,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16)),
+                                Text(
+                                  schedule.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                                 if (schedule.location != null &&
                                     schedule.location!.isNotEmpty)
-                                  Text(schedule.location!,
-                                      style: const TextStyle(
-                                          fontStyle: FontStyle.italic,
-                                          color: Colors.grey,
-                                          fontSize: 12)),
+                                  Text(
+                                    schedule.location!,
+                                    style: const TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 const SizedBox(height: 4),
-                                Text(formattedDate,
-                                    style: const TextStyle(fontSize: 12)),
                                 Text(
-                                    'Waktu: $formattedStartTime - $formattedEndTime WIB',
-                                    style: const TextStyle(fontSize: 12)),
+                                  formattedDate,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                Text(
+                                  'Waktu: $formattedStartTime - $formattedEndTime WIB',
+                                  style: const TextStyle(fontSize: 12),
+                                ),
                               ],
                             ),
                           ),
@@ -238,25 +316,29 @@ class _SchedulePageState extends State<SchedulePage> {
                           if (schedule.latitude != null &&
                               schedule.longitude != null)
                             IconButton(
-                              icon: Icon(Icons.explore_outlined,
-                                  color: Colors.blueAccent[100]),
+                              icon: Icon(
+                                Icons.explore_outlined,
+                                color: Colors.blueAccent[100],
+                              ),
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CompassPage(
-                                              destinationLat:
-                                                  schedule.latitude!,
-                                              destinationLng:
-                                                  schedule.longitude!,
-                                              destinationName: schedule.title,
-                                            )));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CompassPage(
+                                      destinationLat: schedule.latitude!,
+                                      destinationLng: schedule.longitude!,
+                                      destinationName: schedule.title,
+                                    ),
+                                  ),
+                                );
                               },
                               tooltip: 'Arahkan Kompas',
                             ),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline,
-                                color: Colors.redAccent),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.redAccent,
+                            ),
                             onPressed: () {
                               // ... logika hapus sama ...
                             },

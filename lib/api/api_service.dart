@@ -24,6 +24,37 @@ class ApiService {
     }
   }
 
+   // --- FUNGSI BARU UNTUK UPDATE JADWAL ---
+  Future<Map<String, dynamic>> updateSchedule({
+    required int scheduleId,
+    required String title,
+    String? description,
+    String? location,
+    double? latitude,
+    double? longitude,
+    required String startTime,
+    required String endTime,
+  }) async {
+    final response = await http.put(
+      Uri.parse('$_baseUrl/schedules/$scheduleId'), // Menggunakan rute PUT
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({
+        'title': title,
+        'description': description ?? '',
+        'location': location,
+        'latitude': latitude,
+        'longitude': longitude,
+        'start_time': startTime,
+        'end_time': endTime,
+      }),
+    );
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Gagal memperbarui jadwal: ${response.body}');
+    }
+  }
+  
   Future<Map<String, dynamic>> registerUser(
     String username,
     String email,

@@ -37,11 +37,14 @@ dependencies:
   # Paket untuk koneksi ke backend & data lokal
   http: ^1.2.1
   shared_preferences: ^2.2.3
+  url_launcher: ^6.3.0
 
   # Paket untuk format tanggal & notifikasi
   intl: ^0.19.0
-  flutter_local_notifications: ^17.1.2
+  flutter_local_notifications: ^18.0.1
   timezone: ^0.9.4
+  permission_handler: ^12.0.0+1
+  # Paket untuk autentikasi & keamanan
 
   # Paket untuk fitur utama (Sensor & Peta)
   sensors_plus: ^5.0.1
@@ -77,6 +80,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - .env
+    - assets/images/
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
